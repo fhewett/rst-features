@@ -6,4 +6,5 @@ source $VENV/bin/activate
 pip install -r requirements.txt
 
 echo "Running models..."
-python run_models/run_models.py
+cd run_models
+python run_models.py
