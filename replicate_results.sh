@@ -1,7 +1,7 @@
 VENV='rst-features'
 
 echo "Preparing Python environment..."
-virtualenv -p python3 $VENV
+python3 -m venv $VENV
 source $VENV/bin/activate
 pip install -r requirements.txt
 
