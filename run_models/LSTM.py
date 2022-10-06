@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from sklearn.metrics import f1_score
 import random
 import numpy as np
-from models.LR import create_data_sent
+from LR import create_data_sent
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import precision_score, recall_score, make_scorer, f1_score
 import warnings
