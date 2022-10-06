@@ -16,10 +16,6 @@ import torch.nn as nn
 
 if __name__ == "__main__":
 
-    #print(torch.cuda.current_device())
-    # torch.manual_seed(1)
-    # torch.cuda.manual_seed(123)
-    #np.random.seed(0)
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-json_features', type=str, default="../sent_level_pcc.json", help='JSON file with the features')
@@ -43,10 +39,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    #if torch.cuda.current_device() != -1:
-        #args.use_gpu = True
-
-    #n_gpu = torch.cuda.device_count()
     all_texts_sent = json.load(open(args.json_features, 'r'))
 
     def print_results(f1_mic, precision, recall, f1_min, model_name_for_log, all_mode=False, epochs=args.epochs):
