@@ -10,7 +10,7 @@ You can also use this code to extract features from your .rs3 files. The feature
 ## Usage
 
 - To replicate the models in the paper just run replicate_results.sh. This creates a virtual environment and runs the models using the features `edu_level_pcc.json` and/or `sent_level_pcc.json`.
-- To create the PCC features used in the paper, first download the [PCC](http://angcl.ling.uni-potsdam.de/resources/pcc.html) and then download the [summaries](https://github.com/fhewett/pcc-summaries). Put the `pcc-summaries` folder in the `PotsdamCommentaryCorpus` folder.  
+- To create the PCC features used in the paper, first download the [PCC](http://angcl.ling.uni-potsdam.de/resources/pcc.html) and then download the [summaries](https://github.com/fhewett/pcc-summaries). Put the `pcc-summaries` folder in the `PotsdamCommentaryCorpus` folder. Then run `rst-create-features.py` with the default arguments (it will throw ca. 7 errors, this is expected and due to the way the PCC is segmented).
 - To extract features from your own data run `rst-create-features.py`. It takes the arguments `corpus_path` (where is your corpus saved) and `level` (do you want `edu`, `sentence` or `both` level features). If you are using your own corpus you should have two folders within your `corpus_path`: one called `rst` with .rs3 formatted files and one called `syntax` with .txt files with one sentence per line. The file names should be identical (apart from the file ending). Note: if you are working with a language other than German, you should change the spacy model accordingly (currently set to `de_core_news_sm`).
 
 ## Associated files
