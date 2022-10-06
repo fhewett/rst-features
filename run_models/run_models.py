@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # model
     parser.add_argument('-dropout', type=float, default=0.1, help='the probability for dropout [default: 0.1]')
     parser.add_argument('-weights', nargs='+', default=[0.3, 2.5], type=float, help='weights')
-    parser.add_argument('-features', nargs='+', default=['s_or_n', 'relations', 'most_nuclear', 'sentence_length', 'position'], help='features (SN, rels, depth, most nuclear)')
+    parser.add_argument('-features', nargs='+', default=['s_or_n', 'relations', 'most_nuclear', 'sent_length', 'position'], help='features (SN, rels, depth, most nuclear)')
     parser.add_argument('-embedding', type=str, default='sent', help='type of embedding (none, sent, doc)')
     parser.add_argument('-log_fn', type=str, default='log_file.txt', help='the name of the log file (default log_file.txt)')
     parser.add_argument('-log', action='store_true', default=False, help='log metrics/params in a file (default=False)')
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                     print("F1 ", f1_mic, " Precision ", precision, " Recall ", recall, " F1 minority ", f1_min)
 
     if args.all:
-        for combi in list(powerset(['s_or_n', 'relations', 'depth_scores', 'most_nuclear', 'sentence_length',
+        for combi in list(powerset(['s_or_n', 'relations', 'depth_scores', 'most_nuclear', 'sent_length',
                            'position'])):
             for embeds in [None, 'sent', 'doc']:
                 if combi == ():
