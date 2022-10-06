@@ -103,7 +103,7 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
 
         ########################
 
-    with open('/Users/freya.hewett/neural-seg-class/labels_for_ffn.p', 'rb') as handle:
+    with open('labels_for_ffn.p', 'rb') as handle:
         labels2 = pickle.load(handle)
 
     if features != None:
@@ -114,27 +114,23 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
 
     if embeddings == None:
         feature_dim = encoder_trans.shape[1]
-        #feats, labs, _ = create_data_sent_nest(features_dict, features, encoder, encoder_trans.shape[1], binary=True)
         pcc_dataset_bow = BoWDataset(input_features=encoder_trans, labels_list=labels2)
 
     elif embeddings == 'sent':
-        sent_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/all_sents_nested.pt')).numpy() #torch.load('/Users/freya.hewett/neural-seg-class/without_14654.pt')
-        #feature_dim = encoder_trans.shape[1]
+        sent_embeddings = (torch.load('all_sents_nested.pt')).numpy()
         if features != None:
-            #feats, labs, _ = create_data_sent_nest_onehot(features_dict, features, encoder_trans.shape[1], encoder, encode=True)
             sparse_plus_norm = np.concatenate((sent_embeddings, encoder_trans), axis=1)
             pcc_dataset_bow = BoWDataset(input_features=sparse_plus_norm, labels_list=labels2)
             feature_dim = sparse_plus_norm.shape[1]
-            print("dim", feature_dim)
+            #print("dim", feature_dim)
         else:
             pcc_dataset_bow = BoWDataset(input_features=sent_embeddings, labels_list=labels2)
             feature_dim = sent_embeddings.shape[1]
 
     elif embeddings == 'doc':
-        doc_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/all_sents_nested_context.pt')).numpy()
+        doc_embeddings = (torch.load('all_sents_nested_context.pt')).numpy()
 
         if features != None:
-            #feats, labs, _ = create_data_sent_nest_onehot(features_dict, features, encoder_trans.shape[1], encoder, encode=True)
             sparse_plus_cont = np.concatenate((doc_embeddings, encoder_trans), axis=1)
             pcc_dataset_bow = BoWDataset(input_features=sparse_plus_cont, labels_list=labels2)
             feature_dim = sparse_plus_cont.shape[1]
@@ -144,7 +140,7 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
 
 
     split_train_, split_test_ = \
-                    random_split(pcc_dataset_bow, [1325,569])#[1325, 569])
+                    random_split(pcc_dataset_bow, [1325,569])
     train_dataloader = DataLoader(split_train_, batch_size=batch_size, worker_init_fn=seed_worker, shuffle=False)
     test_dataloader = DataLoader(split_test_, batch_size=batch_size, worker_init_fn=seed_worker, shuffle=False)
 
@@ -154,8 +150,6 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
     model = FFNClassifier(feature_dim, num_class).to(device)
 
     def train(dataloader):
-        # use the modules apply function to recursively apply the initialization
-        #model.apply(init_constant)
         model.train()
         total_acc, total_count = 0, 0
 
@@ -173,16 +167,10 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
             #print(predicted_label_.shape, predicted_label_)
 
             total_acc += (predicted_label_.argmax(1) == sample_batch['labels'].argmax(1)).sum().item()
-            total_count += sample_batch['labels'].size(0) #* sample_batch['labels'].size(0)
-
-        #print('| epoch {:3d} | '
-        #          '| accuracy {:8.3f}'.format(epoch,
-        #                                      total_acc/total_count))
-        #print("f1 score", f1_score(torch.flatten(sample_batch['labels'].argmax(2)), torch.flatten(predicted_label_.argmax(2)), labels=[1]))
+            total_count += sample_batch['labels'].size(0)
             total_acc, total_count = 0, 0
 
     def evaluate(dataloader):
-    #model.apply(init_constant)
         model.eval()
         total_acc, total_count = 0, 0
 
@@ -191,7 +179,6 @@ def get_results_ffn(features_dict, batch_size, epochs, learning_rate, weights, f
         with torch.no_grad():
             for idx, sample_batch in enumerate(dataloader):
                 predicted_label = model(sample_batch['features'].float())
-                #loss = criterion(predicted_label, sample_batch['labels'])
                 predicted_label_ = torch.sigmoid(predicted_label)
 
                 total_acc += (predicted_label_.argmax(1) == sample_batch['labels'].argmax(1)).sum().item()

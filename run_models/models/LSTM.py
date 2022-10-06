@@ -116,8 +116,6 @@ def get_metrics(true, pred):
 
     return prec, rec, f1_minority, f1_micro
 
-#features, labels = [], []
-
 
 def create_data_sent_nest(features_dict, chosen_features, fit_encoder, feature_dim, binary=True):
 
@@ -129,17 +127,14 @@ def create_data_sent_nest(features_dict, chosen_features, fit_encoder, feature_d
         if text == 'maz-12666':
             continue
         else:
-        #subfeatures, sublabels = [], []
             for item in features_dict[text]:
 
-                #for edu in range(len(item['edu_ids'])):
                 feats = []
                 for feat in chosen_features:
                     if type(item[feat][0]) != str:
                         feats.append(str(item[feat][0]))
                     else:
                         feats.append(item[feat][0])
-                    #subfeatures.append((item['s_or_n'][edu], item['relations'][edu], item['depth_scores'][edu], item['most_nuclear'][edu]))
 
                 if binary:
                     if item['importance'][0] != 0:
@@ -153,14 +148,10 @@ def create_data_sent_nest(features_dict, chosen_features, fit_encoder, feature_d
 
         # Pad then append
         encoded = fit_encoder.transform(subsubfeatures)
-        #print("encoded", encoded.shape)
         padded = np.pad(encoded, pad_width=((0, (18-len(encoded))), (0,0)), mode='constant')
-        #print("p", padded.shape, padded)
         expanded = np.expand_dims(padded, axis=0)
-        #print(expanded.shape, expanded)
         subfeatures[i] = expanded
 
-    #print("here", subfeatures)
     if len(chosen_features) == 1:
         feats = np.array(subfeatures).reshape(-1,1)
 
@@ -200,22 +191,15 @@ def create_data_sent_nest_onehot(features_dict, chosen_features, feature_dim, fi
 
         # Pad then append
         if encode:
-
             encoded = fit_encoder.transform(subsubfeatures)
         else:
             encoded = subsubfeatures
-
-        #feature_dim = encoded.shape[1]
-
-
-        #print("encoded", encoded.shape)
         padded = np.pad(encoded, pad_width=((0, (18-len(encoded))), (0,0)), mode='constant')
-        #print("p", padded.shape, padded)
+        #print(padded.shape, padded)
         expanded = np.expand_dims(padded, axis=0)
         #print(expanded.shape, expanded)
         subfeatures[i] = expanded
 
-    #else:
     feats = np.array(subfeatures)
 
     return feats, sublabels, subfeatures
@@ -224,7 +208,7 @@ def get_results_lstm(features_dict, batch_size, epochs, learning_rate, weights, 
 
     seed_all(10)
 
-    with open('/Users/freya.hewett/neural-seg-class/labels_nested_binarized.p', 'rb') as handle:
+    with open('labels_nested_binarized.p', 'rb') as handle:
         labels2 = pickle.load(handle)
 
     if features != None:
@@ -238,11 +222,9 @@ def get_results_lstm(features_dict, batch_size, epochs, learning_rate, weights, 
         _, _, feats = create_data_sent_nest(features_dict, features, encoder, encoder_trans.shape[1], binary=True)
         #print(feats.shape)
         pcc_dataset_bow = BoWDataset(input_features=feats, labels_list=labels2)
-        #here is where the error is?
 
     elif embeddings == 'sent':
-        sent_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/padded_sequence_normal_sent.pt')).numpy()
-        #feature_dim = encoder_trans.shape[1]
+        sent_embeddings = (torch.load('padded_sequence_normal_sent.pt')).numpy()
         if features != None:
             feats, labs, _ = create_data_sent_nest_onehot(features_dict, features, encoder_trans.shape[1], encoder, encode=True)
             sparse_plus_norm = np.concatenate((sent_embeddings, feats), axis=2)
@@ -253,7 +235,7 @@ def get_results_lstm(features_dict, batch_size, epochs, learning_rate, weights, 
             feature_dim = sent_embeddings.shape[2]
 
     elif embeddings == 'doc':
-        doc_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/padded_sequence_context_sent.pt')).numpy()
+        doc_embeddings = (torch.load('padded_sequence_context_sent.pt')).numpy()
 
         if features != None:
             feats, labs, _ = create_data_sent_nest_onehot(features_dict, features, encoder_trans.shape[1], encoder, encode=True)
@@ -292,10 +274,6 @@ def get_results_lstm(features_dict, batch_size, epochs, learning_rate, weights, 
             total_acc += (predicted_label_.argmax(2) == sample_batch['labels'].argmax(2)).sum().item()
             total_count += sample_batch['labels'].size(1) * sample_batch['labels'].size(0)
 
-            #print('| epoch {:3d} | '
-            #          '| accuracy {:8.3f}'.format(epoch,
-            #                                      total_acc/total_count))
-            #print("f1 score", f1_score(torch.flatten(sample_batch['labels'].argmax(2)), torch.flatten(predicted_label_.argmax(2)), labels=[1]))
             total_acc, total_count = 0, 0
 
     def evaluate(dataloader):

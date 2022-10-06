@@ -16,8 +16,6 @@ from sklearn.base import clone
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_validate
-#from sklearn.metrics import f1_score, classification_report
-#from sklearn.tree import DecisionTreeClassifier
 
 from more_itertools import powerset
 
@@ -45,7 +43,6 @@ embed_clf = Pipeline([
   ('log_reg', LogisticRegression(class_weight='balanced', random_state=RANDOM_SEED, penalty='l1', solver='liblinear'))
 ])
 
-#features, labels = [], []
 def create_data_sent(features_dict, chosen_features, binary=True):
 
     subfeatures, sublabels = [], []
@@ -53,14 +50,11 @@ def create_data_sent(features_dict, chosen_features, binary=True):
         if text == 'maz-12666':
             continue
         else:
-        #subfeatures, sublabels = [], []
             for item in features_dict[text]:
 
-                #for edu in range(len(item['edu_ids'])):
                 feats = []
                 for feat in chosen_features:
                     feats.append(item[feat][0])
-                    #subfeatures.append((item['s_or_n'][edu], item['relations'][edu], item['depth_scores'][edu], item['most_nuclear'][edu]))
                 subfeatures.append(tuple(feats))
                 if binary:
                     if item['importance'][0] != 0:
@@ -79,9 +73,7 @@ def create_data_sent(features_dict, chosen_features, binary=True):
 
     return feats, sublabels
 
-#INPUT: FEATURES
-
-def LR_model(feature_dict, input_features, embeddings): #feature_dict is all_texts_sent
+def LR_model(feature_dict, input_features, embeddings):
 
     if embeddings == None:
         f,l = create_data_sent(feature_dict, input_features)
@@ -91,7 +83,7 @@ def LR_model(feature_dict, input_features, embeddings): #feature_dict is all_tex
                                                          'recall': rec_scorer, 'f1': f1_scorer}))
 
     if embeddings == 'sent':
-        sent_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/all_sents_nested.pt')).numpy()
+        sent_embeddings = (torch.load('all_sents_nested.pt')).numpy()
         clfs = clone(embed_clf)
         if input_features != ['None']:
             f,l = create_data_sent(feature_dict, input_features)
@@ -103,14 +95,14 @@ def LR_model(feature_dict, input_features, embeddings): #feature_dict is all_tex
                         scoring=({'f1_minority':f1_minority, 'precision': prec_scorer,
                                                          'recall': rec_scorer, 'f1': f1_scorer}))
         else:
-            with open('/Users/freya.hewett/neural-seg-class/flat_labels.p', 'rb') as handle:
+            with open('flat_labels.p', 'rb') as handle:
                 l = pickle.load(handle)
             scores = cross_validate(clfs, sent_embeddings,l, cv=10,
                                     scoring=({'f1_minority':f1_minority, 'precision': prec_scorer,
                                                                      'recall': rec_scorer, 'f1': f1_scorer}))
 
     if embeddings == 'doc':
-        doc_embeddings = (torch.load('/Users/freya.hewett/neural-seg-class/all_sents_nested_context.pt')).numpy()
+        doc_embeddings = (torch.load('all_sents_nested_context.pt')).numpy()
         clfs = clone(embed_clf)
         if input_features != ['None']:
             f,l = create_data_sent(feature_dict, input_features)
@@ -122,7 +114,7 @@ def LR_model(feature_dict, input_features, embeddings): #feature_dict is all_tex
                         scoring=({'f1_minority':f1_minority, 'precision': prec_scorer,
                                                          'recall': rec_scorer, 'f1': f1_scorer}))
         else:
-            with open('/Users/freya.hewett/neural-seg-class/flat_labels.p', 'rb') as handle:
+            with open('flat_labels.p', 'rb') as handle:
                 l = pickle.load(handle)
             scores = cross_validate(clfs, doc_embeddings,l, cv=10,
                                     scoring=({'f1_minority':f1_minority, 'precision': prec_scorer,
