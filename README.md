@@ -22,5 +22,5 @@ You can also use this code to extract features from your .rs3 files. The feature
 
 More information can be found in the paper. If you use anything from this repository please cite the following paper:
 
-Freya Hewett and Manfred Stede. Extractive summarisation for German-language data: a text-level approach with discourse features. In *Proceedings of the 29th International Conference on Computational Linguistics (COLING)*. 2022. To appear.
+Freya Hewett and Manfred Stede. [Extractive summarisation for German-language data: a text-level approach with discourse features](https://aclanthology.org/2022.coling-1.63/). In *Proceedings of the 29th International Conference on Computational Linguistics (COLING)*. 2022. 
 
